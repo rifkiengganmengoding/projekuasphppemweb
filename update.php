@@ -2,16 +2,18 @@
 include "header.php";
 include "koneksi.php";
 
-
-header("Content-Type: application/json");
-include "koneksi.php";
-
 $id = intval($_GET['id']);
 $data = json_decode(file_get_contents("php://input"));
 
-$nama = $koneksi->real_escape_string($data->nama);
-$harga = floatval($data->harga);
-$deskripsi = $koneksi->real_escape_string($data->deskripsi);
+if (!$data) {
+    http_response_code(400);
+    echo json_encode(["error" => "Data JSON tidak ditemukan"]);
+    exit();
+}
+
+$nama = $koneksi->real_escape_string($data->nama ?? '');
+$harga = floatval($data->harga ?? 0);
+$deskripsi = $koneksi->real_escape_string($data->deskripsi ?? '');
 
 $sql = "UPDATE produk SET nama='$nama', harga='$harga', deskripsi='$deskripsi' WHERE id=$id";
 
