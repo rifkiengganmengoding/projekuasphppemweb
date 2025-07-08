@@ -2,9 +2,7 @@
 include "header.php";
 include "koneksi.php";
 
-$id = intval($_GET['id']);
 $data = json_decode(file_get_contents("php://input"));
-
 if (!$data) {
     http_response_code(400);
     echo json_encode(["error" => "Data JSON tidak ditemukan"]);
@@ -12,14 +10,14 @@ if (!$data) {
 }
 
 $nama = $koneksi->real_escape_string($data->nama ?? '');
-$harga = floatval($data->harga ?? 0);
-$deskripsi = $koneksi->real_escape_string($data->deskripsi ?? '');
+$komentar = $koneksi->real_escape_string($data->komentar ?? '');
+$rating = intval($data->rating ?? 0);
 
-$sql = "UPDATE produk SET nama='$nama', harga='$harga', deskripsi='$deskripsi' WHERE id=$id";
-
+$sql = "INSERT INTO ulasan (nama, komentar, rating) VALUES ('$nama', '$komentar', $rating)";
 if ($koneksi->query($sql)) {
-    echo json_encode(["status" => "Produk berhasil diupdate"]);
+    echo json_encode(["status" => "Ulasan berhasil ditambahkan"]);
 } else {
     echo json_encode(["error" => $koneksi->error]);
 }
 ?>
+
