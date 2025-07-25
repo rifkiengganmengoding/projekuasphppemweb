@@ -1,7 +1,21 @@
 <?php
 include "config.php";
-$id = $_GET['id'];
-$data = $koneksi->query("SELECT * FROM ulasan WHERE id=$id")->fetch_assoc();
+
+// Ambil ID dari URL
+$id = $_GET['id'] ?? null;
+
+// Cek kalau ID gak ada
+if (!$id) {
+  echo "ID tidak ditemukan.";
+  exit;
+}
+
+// Ambil data dari database
+$data = $koneksi->query("SELECT * FROM ulasan WHERE id = $id")->fetch_assoc();
+if (!$data) {
+  echo "Data tidak ditemukan.";
+  exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +26,11 @@ $data = $koneksi->query("SELECT * FROM ulasan WHERE id=$id")->fetch_assoc();
 </head>
 <body>
   <h1>Edit Ulasan</h1>
-  <form method="post" action="update.php?id=<?= $id ?>">
+
+  <form method="post" action="update.php">
+    <!-- Kirim ID lewat POST (wajib biar update.php bisa baca $_POST['id']) -->
+    <input type="hidden" name="id" value="<?= $data['id'] ?>">
+
     <label>Nama:</label><br>
     <input type="text" name="nama" value="<?= $data['nama'] ?>" required><br><br>
 
@@ -20,8 +38,8 @@ $data = $koneksi->query("SELECT * FROM ulasan WHERE id=$id")->fetch_assoc();
     <textarea name="komentar" required><?= $data['komentar'] ?></textarea><br><br>
 
     <label>Rating:</label><br>
-    <select name="rating">
-      <?php for($i=5;$i>=1;$i--): ?>
+    <select name="rating" required>
+      <?php for ($i = 5; $i >= 1; $i--): ?>
         <option value="<?= $i ?>" <?= $data['rating'] == $i ? 'selected' : '' ?>><?= $i ?></option>
       <?php endfor; ?>
     </select><br><br>
